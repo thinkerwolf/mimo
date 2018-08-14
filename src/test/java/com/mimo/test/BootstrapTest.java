@@ -18,7 +18,6 @@ import com.mimo.util.NetUtils;
 
 public class BootstrapTest {
 
-	@Test
 	public static void start() throws InterruptedException {
 		Bootstrap bootstrap = new Bootstrap();
 		RunLoopGroup group = new NioRunLoopGroup(2);

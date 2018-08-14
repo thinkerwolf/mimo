@@ -13,7 +13,6 @@ import com.mimo.test.processor.TestServerChannelOutbound;
 
 public class ServerBootstrapTest {
 
-	@Test
 	public static void start() {
 		ServerBootstrap bootstrap = new ServerBootstrap();
 		RunLoopGroup group = new NioRunLoopGroup();

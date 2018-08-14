@@ -13,7 +13,6 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B>> {
 	private ChannelFactory<Channel> channelFactory;
 	private ChannelInitializer initializer;
 
-
 	@SuppressWarnings("unchecked")
 	public B channel(Class<? extends Channel> clazz) {
 		this.channelFactory = new BootstrapChannelFactory<Channel>(clazz);
@@ -31,7 +30,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B>> {
 	protected ChannelFuture initAndRegister() {
 		final Channel channel = channelFactory.newChannel();
 		initializer.initChannel(channel);
-        ChannelFuture future = group.register(channel);
+		ChannelFuture future = group.register(channel);
 		channel.connect(localAddress(), remoteAddress());
 		init();
 		group.startExecutor();
@@ -48,7 +47,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B>> {
 		return (B) this;
 	}
 
-	private static final class BootstrapChannelFactory<C extends Channel> implements ChannelFactory {
+	private static final class BootstrapChannelFactory<C extends Channel> implements ChannelFactory<Channel> {
 		private Class<? extends Channel> clazz;
 
 		public BootstrapChannelFactory(Class<? extends Channel> clazz) {

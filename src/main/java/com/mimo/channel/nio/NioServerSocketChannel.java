@@ -74,18 +74,6 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.mi
 		super.doClose();
 	}
 
-	@Override
-	protected boolean doAccept(Selector selector) throws IOException {
-		SocketChannel sc = NetUtils.accept(nioChannel());
-		if (sc != null) {
-			sc.configureBlocking(false);
-			NioSocketChannel nsc = new NioSocketChannel(sc, this.chain());
-			sc.register(selector, SelectionKey.OP_READ, nsc);
-			return true;
-		}
-		return false;
-	}
-
 	public void doWrite(ByteBuffer buf, boolean flush) {
 		throw new RuntimeException("NioServerSocket can't write");
 	}

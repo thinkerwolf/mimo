@@ -70,11 +70,6 @@ public class NioSocketChannel extends AbstractNioChannel implements com.mimo.cha
 		nioChannel().close();
 	}
 
-	@Override
-	protected boolean doAccept(Selector selector) throws IOException {
-		throw new UnsupportedOperationException("client can't accept");
-	}
-
 	public void doWrite(ByteBuffer buf, boolean flush) {
 		try {
 			final SocketChannel sc = nioChannel();

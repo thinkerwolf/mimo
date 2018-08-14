@@ -5,10 +5,6 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +56,6 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 
 	protected abstract boolean doConnect(SocketAddress localAddress, SocketAddress remoteAddress) throws Exception;
 
-	protected abstract boolean doAccept(Selector selector) throws IOException;
-
 	@Override
 	public void register(RunLoop runLoop, ChannelFuture future) {
 		try {
@@ -72,45 +66,6 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * 读取
-	 * 
-	 * @param sk
-	 */
-	void read(SelectionKey sk) {
-		NioSocketChannel nioChannel = (NioSocketChannel) sk.attachment();
-		SocketChannel channel = nioChannel.nioChannel();
-		if (channel != null) {
-			try {
-				int totalReadNum = 0;
-				int tmpReadNum;
-
-				ByteBuffer bb = ByteBuffer.allocateDirect(100);
-				List<ByteBuffer> list = new ArrayList<>();
-				while ((tmpReadNum = channel.read(bb)) > 0) {
-					totalReadNum += tmpReadNum;
-					list.add(bb);
-					bb = ByteBuffer.allocateDirect(100);
-				}
-				ByteBuffer buf = ByteBuffer.allocate(totalReadNum);
-				for (ByteBuffer b : list) {
-					b.flip();
-					buf.put(b);
-				}
-				buf.flip();
-				fireMessageReceived(this.chain(), nioChannel, buf);
-			} catch (Exception e) {
-				try {
-					channel.close();
-					channel.socket().close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				fireExceptionCaught(chain(), e, true);
-			}
 		}
 	}
 
@@ -132,38 +87,6 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 	}
 
 	protected abstract void doWrite(ByteBuffer buf, boolean flush);
-
-	/**
-	 * 接受
-	 * 
-	 * @param sk
-	 * @throws Throwable
-	 */
-	void accept(SelectionKey sk) throws Throwable {
-		if (doAccept(sk.selector())) {
-			logger.debug("channel accept success");
-		} else {
-			logger.debug("channel accept error");
-		}
-
-	}
-
-	/**
-	 * 连接
-	 * 
-	 * @param sk
-	 * @throws Throwable
-	 */
-	void connect(SelectionKey sk) throws Throwable {
-		int ops = sk.interestOps();
-		ops &= ~SelectionKey.OP_CONNECT;
-		ops |= SelectionKey.OP_READ;
-		sk.interestOps(ops);
-		SocketChannel channel = (SocketChannel) ch;
-		channel.finishConnect();
-		this.finishConnectFuture.setSuccess(null);
-		logger.debug("channel connect!");
-	}
 
 	public void writeInner(Object obj, boolean flush) {
 		if (!(obj instanceof ByteBuffer)) {

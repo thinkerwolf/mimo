@@ -18,9 +18,7 @@ public class TestServerChannelInbound extends SimpleChannelInboundProcessor {
 			sb.append((char) bb.get());
 		}
 		System.out.println("messageReceived : " + sb);
-
 		message.channel().writeAndFlush("423212123");
-
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.mimo.channel;
 
+import com.mimo.channel.event.ChannelEvent;
 import com.mimo.processor.ChannelProcessor;
 
 /**
@@ -17,11 +18,41 @@ public interface ChannelProcessorChain {
 	void addLast(ChannelProcessor processor);
 
 	void addFirst(ChannelProcessor processor);
-	
-	void sendInbound(ChannelEvent ce);
-	
-	void sendOutbound(ChannelEvent ce);
-	
+
+	/**
+	 * 发送输入流事件
+	 * 
+	 * @param event
+	 */
+	void sendInbound(ChannelEvent event);
+
+	/**
+	 * 发送输出流事件
+	 * 
+	 * @param event
+	 */
+	void sendOutbound(ChannelEvent event);
+
+	/**
+	 * 发送异常
+	 * 
+	 * @param inbound
+	 * @param etx
+	 */
 	void sendException(boolean inbound, Throwable etx);
-	
+
+	/**
+	 * 发送连接完成
+	 * 
+	 * @param event
+	 */
+	void sendConnected(ChannelEvent event);
+
+	/**
+	 * 发送接受完成
+	 * 
+	 * @param event
+	 */
+	void sendAccepted(ChannelEvent event);
+
 }

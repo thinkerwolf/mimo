@@ -1,12 +1,17 @@
 package com.mimo.channel.nio;
 
+import static com.mimo.channel.Channels.*;
+
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.mimo.channel.Channel;
 import com.mimo.channel.ChannelProcessorChain;
 import com.mimo.util.NetUtils;
 import com.mimo.util.PlatformUtil;
@@ -66,7 +71,7 @@ public class NioSocketChannel extends AbstractNioChannel implements com.mimo.cha
 	}
 
 	@Override
-	public boolean doAccept(Selector selector) throws IOException {
+	protected boolean doAccept(Selector selector) throws IOException {
 		throw new UnsupportedOperationException("client can't accept");
 	}
 
@@ -83,12 +88,67 @@ public class NioSocketChannel extends AbstractNioChannel implements com.mimo.cha
 
 			}
 
-
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	class NioUnderLayer extends AbstractNioUnderLayer {
+		@Override
+		protected void doRead() {
+			NioSocketChannel channel = NioSocketChannel.this;
+			SocketChannel nioChannel = channel.nioChannel();
+			if (nioChannel != null) {
+				try {
+					int totalReadNum = 0;
+					int tmpReadNum;
+
+					ByteBuffer bb = ByteBuffer.allocateDirect(100);
+					List<ByteBuffer> list = new ArrayList<>();
+					while ((tmpReadNum = nioChannel.read(bb)) > 0) {
+						totalReadNum += tmpReadNum;
+						list.add(bb);
+						bb = ByteBuffer.allocateDirect(100);
+					}
+					ByteBuffer buf = ByteBuffer.allocate(totalReadNum);
+					for (ByteBuffer b : list) {
+						b.flip();
+						buf.put(b);
+					}
+					buf.flip();
+					fireMessageReceived(channel.chain(), channel, buf);
+				} catch (Exception e) {
+					try {
+						close();
+					} catch (IOException e1) {
+						// Ignore
+					}
+					fireExceptionCaught(chain(), e, true);
+				}
+			}
+		}
+
+		@Override
+		protected void doConnect() throws IOException {
+			NioSocketChannel channel = NioSocketChannel.this;
+			SocketChannel nioChannel = channel.nioChannel();
+			nioChannel.finishConnect();
+			channel.finishConnectFuture.setSuccess(null);
+			fireChannelConnected(channel.chain(), channel);
+		}
+
+		@Override
+		public Channel accept() throws IOException {
+			// do nothing
+			throw new RuntimeException("NioServerSocket can't accept");
+		}
+
+	}
+
+	@Override
+	protected UnderLayer newUnderLayer() {
+		return new NioUnderLayer();
 	}
 
 }

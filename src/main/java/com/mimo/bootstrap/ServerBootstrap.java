@@ -39,7 +39,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap> {
 	@Override
 	void init() {
 		// workerGroup执行读写任务
-
+		
 	}
 
 	@Override
@@ -51,5 +51,5 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap> {
 	protected SocketAddress remoteAddress() {
 		return null;
 	}
-
+	
 }

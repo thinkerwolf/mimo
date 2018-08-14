@@ -23,7 +23,7 @@ public class Bootstrap extends AbstractBootstrap<Bootstrap> {
 	}
 
 	public ChannelFuture connect(String host, int port) {
-		return this.connect(new InetSocketAddress(host, port));
+		return connect(new InetSocketAddress(host, port));
 	}
 
 	public ChannelFuture connect(SocketAddress address) {

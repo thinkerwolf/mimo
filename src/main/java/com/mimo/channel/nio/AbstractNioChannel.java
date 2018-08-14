@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,6 @@ import com.mimo.channel.ChannelProcessorChain;
 import static com.mimo.channel.Channels.*;
 import com.mimo.channel.RunLoop;
 import com.mimo.concurrent.ChannelFuture;
-import com.mimo.util.NetUtils;
 import com.mimo.util.ObjectUtil;
 
 public abstract class AbstractNioChannel extends AbstractChannel {
@@ -60,9 +58,9 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 
 	}
 
-	public abstract boolean doConnect(SocketAddress localAddress, SocketAddress remoteAddress) throws Exception;
+	protected abstract boolean doConnect(SocketAddress localAddress, SocketAddress remoteAddress) throws Exception;
 
-	public abstract boolean doAccept(Selector selector) throws IOException;
+	protected abstract boolean doAccept(Selector selector) throws IOException;
 
 	@Override
 	public void register(RunLoop runLoop, ChannelFuture future) {
@@ -77,32 +75,19 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 		}
 	}
 
-	private SocketChannel socketChannel() {
-		try {
-			if (ch instanceof SocketChannel) {
-				return (SocketChannel) ch;
-			} else {
-				return NetUtils.accept((ServerSocketChannel) ch);
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	/**
 	 * 读取
 	 * 
 	 * @param sk
 	 */
 	void read(SelectionKey sk) {
-		SocketChannel channel = (SocketChannel) sk.channel();
 		NioSocketChannel nioChannel = (NioSocketChannel) sk.attachment();
+		SocketChannel channel = nioChannel.nioChannel();
 		if (channel != null) {
 			try {
 				int totalReadNum = 0;
 				int tmpReadNum;
 
-				// FIXME 内存泄漏问题
 				ByteBuffer bb = ByteBuffer.allocateDirect(100);
 				List<ByteBuffer> list = new ArrayList<>();
 				while ((tmpReadNum = channel.read(bb)) > 0) {
@@ -128,6 +113,25 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 			}
 		}
 	}
+
+	@Override
+	public void write(Object obj) {
+		fireMessageWrite(this.chain(), this, obj, false);
+	}
+
+	@Override
+	public void writeAndFlush(Object obj) {
+		fireMessageWrite(this.chain(), this, obj, true);
+	}
+
+	@Override
+	public void flush() {
+	}
+
+	protected void doClose() throws IOException {
+	}
+
+	protected abstract void doWrite(ByteBuffer buf, boolean flush);
 
 	/**
 	 * 接受
@@ -158,25 +162,8 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 		SocketChannel channel = (SocketChannel) ch;
 		channel.finishConnect();
 		this.finishConnectFuture.setSuccess(null);
-		logger.debug("channel connect!" + (sk.channel() == ch));
+		logger.debug("channel connect!");
 	}
-
-	@Override
-	public void write(Object obj) {
-		fireMessageWrite(this.chain(), this, obj, false);
-	}
-
-	@Override
-	public void writeAndFlush(Object obj) {
-		fireMessageWrite(this.chain(), this, obj, true);
-	}
-
-	@Override
-	public void flush() {
-	}
-
-    // 地层的操作，如read，write
-
 
 	public void writeInner(Object obj, boolean flush) {
 		if (!(obj instanceof ByteBuffer)) {
@@ -185,8 +172,26 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 		doWrite((ByteBuffer) obj, flush);
 	}
 
+	protected abstract class AbstractNioUnderLayer extends AbstractUnderLayer {
 
-	protected void doClose() throws IOException {}
-	protected abstract void doWrite(ByteBuffer buf, boolean flush);
-	//protected abstract void doRead(SocketChannel nioChannel, NioSocketChannel channel);
+		@Override
+		public void read() {
+			doRead();
+		}
+
+		@Override
+		public void connect() throws IOException {
+			doConnect();
+		}
+
+		@Override
+		public void close() throws IOException {
+			AbstractNioChannel.this.ch.close();
+		}
+
+		protected abstract void doConnect() throws IOException;
+
+		protected abstract void doRead();
+	}
+
 }

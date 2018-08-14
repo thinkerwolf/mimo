@@ -1,4 +1,4 @@
-package com.mimo.channel;
+package com.mimo.channel.event;
 
 public interface MessageEvent extends ChannelEvent {
 	

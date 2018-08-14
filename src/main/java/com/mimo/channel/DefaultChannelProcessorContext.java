@@ -1,8 +1,10 @@
 package com.mimo.channel;
 
+import com.mimo.channel.event.ChannelEvent;
 import com.mimo.processor.ChannelInboundProcessor;
 import com.mimo.processor.ChannelOutboundProcessor;
 import com.mimo.processor.ChannelProcessor;
+import com.mimo.util.ObjectUtil;
 
 class DefaultChannelProcessorContext implements ChannelProcessorContext {
 
@@ -42,7 +44,7 @@ class DefaultChannelProcessorContext implements ChannelProcessorContext {
 
 	@Override
 	public ChannelProcessor processor() {
-		return processor;
+		return ObjectUtil.isNotNull(processor, "processor null");
 	}
 
 	@Override
@@ -90,17 +92,60 @@ class DefaultChannelProcessorContext implements ChannelProcessorContext {
 					break;
 				}
 				ctx = ctx.pre;
-				
+
 				if (ctx == null) {
 					channel.writeInner(msg, true);
 				}
-				
+
 			}
-			
+
 		}
-		
-		
-		
+
 	}
 
+	@Override
+	public void sendException(Throwable etx) {
+		ChannelProcessorContext ctx = nextContext();
+		if (ctx != null) {
+			ctx.processor().exceptionCaught(ctx, etx);
+		}
+	}
+
+	@Override
+	public void sendConnected(ChannelEvent event) {
+		ChannelProcessorContext ctx = nextContext();
+		if (ctx != null) {
+			ctx.processor().channelConnected(ctx, event);
+		}
+	}
+
+	@Override
+	public void sendAccepted(ChannelEvent event) {
+		ChannelProcessorContext ctx = nextContext();
+		if (ctx != null) {
+			ctx.processor().channelAccepted(ctx, event);
+		}
+	}
+
+	private ChannelProcessorContext nextContext() {
+		if (processor instanceof ChannelOutboundProcessor) {
+			if (pre != null) {
+				for (DefaultChannelProcessorContext ctx = pre; ctx != null;) {
+					if (ctx.processor() instanceof ChannelOutboundProcessor) {
+						return ctx;
+					}
+					ctx = ctx.pre;
+				}
+			}
+
+		} else if (processor instanceof ChannelInboundProcessor) {
+			for (DefaultChannelProcessorContext ctx = next; ctx != null;) {
+				if (ctx.processor() instanceof ChannelInboundProcessor) {
+					return ctx;
+				}
+				ctx = ctx.next;
+			}
+		}
+		return null;
+	}
 }

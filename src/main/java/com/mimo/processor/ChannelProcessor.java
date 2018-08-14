@@ -1,6 +1,7 @@
 package com.mimo.processor;
 
 import com.mimo.channel.ChannelProcessorContext;
+import com.mimo.channel.event.ChannelEvent;
 
 public interface ChannelProcessor {
 
@@ -10,5 +11,8 @@ public interface ChannelProcessor {
 	 * @param throwable
 	 */
 	void exceptionCaught(ChannelProcessorContext ctx, Throwable throwable);
+
+	void channelConnected(ChannelProcessorContext ctx, ChannelEvent event);
 	
+	void channelAccepted(ChannelProcessorContext ctx, ChannelEvent event);
 }

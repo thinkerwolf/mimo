@@ -10,13 +10,15 @@ public abstract class AbstractChannel implements Channel {
 
 	private final DefaultChannelProcessorChain chain;
 
+	private UnderLayer underLayer;
 
 	protected AbstractChannel(ChannelProcessorChain chain) {
-		this.chain = (DefaultChannelProcessorChain) chain;
+		this.chain = chain == null ? newProcessorChain() : (DefaultChannelProcessorChain) chain;
+		this.underLayer = newUnderLayer();
 	}
 
 	public AbstractChannel() {
-		this.chain = newProcessorChain();
+		this(null);
 	}
 
 	public ChannelFuture getFinishConnectFuture() {
@@ -32,5 +34,15 @@ public abstract class AbstractChannel implements Channel {
 		return new DefaultChannelProcessorChain(this);
 	}
 
+	@Override
+	public UnderLayer underLayer() {
+		return underLayer;
+	}
+
+	protected abstract UnderLayer newUnderLayer();
+
+	protected abstract class AbstractUnderLayer implements UnderLayer {
+
+	}
 
 }

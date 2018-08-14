@@ -1,4 +1,6 @@
-package com.mimo.channel;
+package com.mimo.channel.event;
+
+import com.mimo.channel.Channel;
 
 /**
  * 写事件

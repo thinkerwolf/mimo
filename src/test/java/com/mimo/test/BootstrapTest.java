@@ -3,11 +3,8 @@ package com.mimo.test;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-import org.junit.Test;
-
 import com.mimo.bootstrap.Bootstrap;
 import com.mimo.channel.Channel;
-import com.mimo.channel.ChannelInitializer;
 import com.mimo.channel.RunLoopGroup;
 import com.mimo.channel.nio.NioRunLoopGroup;
 import com.mimo.channel.nio.NioSocketChannel;

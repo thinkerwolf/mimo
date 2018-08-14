@@ -3,7 +3,7 @@ package com.mimo.test.processor;
 import java.nio.ByteBuffer;
 
 import com.mimo.channel.ChannelProcessorContext;
-import com.mimo.channel.WriteEvent;
+import com.mimo.channel.event.WriteEvent;
 import com.mimo.processor.ChannelOutboundProcessorAdapter;
 
 public class TestClientChannelOutbound extends ChannelOutboundProcessorAdapter {

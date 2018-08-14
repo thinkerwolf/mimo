@@ -37,7 +37,11 @@ public abstract class SingleThreadPreExecutor implements Executor {
 
 	protected abstract void run();
 
-	protected abstract void runAllTasks();
+	protected void runAllTasks() {
+		for (Runnable task; (task = pollTask()) != null;) {
+			task.run();
+		}
+	}
 
 	public boolean hasTask() {
 		return taskQueue.size() > 0;

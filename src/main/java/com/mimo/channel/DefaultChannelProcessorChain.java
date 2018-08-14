@@ -3,6 +3,7 @@ package com.mimo.channel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.mimo.channel.event.ChannelEvent;
 import com.mimo.processor.ChannelInboundProcessor;
 import com.mimo.processor.ChannelOutboundProcessor;
 import com.mimo.processor.ChannelProcessor;
@@ -21,6 +22,10 @@ public class DefaultChannelProcessorChain implements ChannelProcessorChain {
 		this.channel = channel;
 	}
 
+	// public void setChannel(Channel channel) {
+	// this.channel = channel;
+	// }
+
 	@Override
 	public void addLast(String name, ChannelProcessor processor) {
 		if (name == null || processor == null) {
@@ -31,6 +36,7 @@ public class DefaultChannelProcessorChain implements ChannelProcessorChain {
 		} else {
 			checkDuplicateName(name, name2Processor);
 			DefaultChannelProcessorContext ctx = new DefaultChannelProcessorContext(name, channel, this, processor);
+			// DefaultChannelProcessorContext tailPre = tailContext.pre;
 			tailContext.next = ctx;
 			ctx.pre = tailContext;
 			tailContext = ctx;
@@ -137,6 +143,28 @@ public class DefaultChannelProcessorChain implements ChannelProcessorChain {
 		return null;
 	}
 
+	@Override
+	public void sendConnected(ChannelEvent event) {
+		ChannelProcessorContext ctx = findContext(true);
+		if (ctx != null) {
+			ctx.processor().channelConnected(ctx, event);
+		}
+		ctx = findContext(false);
+		if (ctx != null) {
+			ctx.processor().channelConnected(ctx, event);
+		}
+	}
 
+	@Override
+	public void sendAccepted(ChannelEvent event) {
+		ChannelProcessorContext ctx = findContext(true);
+		if (ctx != null) {
+			ctx.processor().channelAccepted(ctx, event);
+		}
+		ctx = findContext(false);
+		if (ctx != null) {
+			ctx.processor().channelAccepted(ctx, event);
+		}
+	}
 
 }

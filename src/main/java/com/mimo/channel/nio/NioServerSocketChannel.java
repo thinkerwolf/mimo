@@ -8,9 +8,11 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+import com.mimo.channel.Channel;
 import com.mimo.util.NetUtils;
 import com.mimo.util.PlatformUtil;
 
+import static com.mimo.channel.Channels.*;
 /**
  * Nio服务端实现
  * 
@@ -73,8 +75,8 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.mi
 	}
 
 	@Override
-	public boolean doAccept(Selector selector) throws IOException {
-		SocketChannel sc = nioChannel().accept();
+	protected boolean doAccept(Selector selector) throws IOException {
+		SocketChannel sc = NetUtils.accept(nioChannel());
 		if (sc != null) {
 			sc.configureBlocking(false);
 			NioSocketChannel nsc = new NioSocketChannel(sc, this.chain());
@@ -86,6 +88,36 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.mi
 
 	public void doWrite(ByteBuffer buf, boolean flush) {
 		throw new RuntimeException("NioServerSocket can't write");
+	}
+
+	class NioServerUnderLayer extends AbstractNioUnderLayer {
+
+		@Override
+		protected void doRead() {
+			// do nothing
+		}
+
+		@Override
+		protected void doConnect() throws IOException {
+			// do nothing
+		}
+
+		@Override
+		public Channel accept() throws IOException {
+			SocketChannel sc = NetUtils.accept(nioChannel());
+			if (sc != null) {
+				sc.configureBlocking(false);
+				NioSocketChannel nsc = new NioSocketChannel(sc, NioServerSocketChannel.this.chain());
+				fireChannelAccepted(NioServerSocketChannel.this.chain(), nsc);
+				return nsc;
+			}
+			return null;
+		}
+	}
+
+	@Override
+	protected UnderLayer newUnderLayer() {
+		return new NioServerUnderLayer();
 	}
 
 }

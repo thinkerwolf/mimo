@@ -1,7 +1,7 @@
 package com.mimo.processor;
 
-import com.mimo.channel.ChannelEvent;
 import com.mimo.channel.ChannelProcessorContext;
+import com.mimo.channel.event.ChannelEvent;
 
 /**
  * 输入处理
@@ -13,4 +13,5 @@ public interface ChannelInboundProcessor extends ChannelProcessor {
 
 	void handleInbound(ChannelProcessorContext ctx, ChannelEvent event);
 
+	
 }

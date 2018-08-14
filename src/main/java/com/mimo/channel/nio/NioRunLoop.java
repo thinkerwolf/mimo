@@ -18,6 +18,7 @@ import com.mimo.channel.RunLoop;
 import com.mimo.concurrent.ChannelFuture;
 import com.mimo.concurrent.SingleThreadPreExecutor;
 import com.mimo.util.ObjectUtil;
+import com.mimo.channel.Channel.UnderLayer;
 
 /**
  * 处理Selection和IO事件
@@ -119,28 +120,29 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 		if (!sk.isValid()) {
 			return;
 		}
+		final UnderLayer underLayer = ch.underLayer();
 		int readyOps = sk.readyOps();
 		if ((readyOps & SelectionKey.OP_CONNECT) != 0) {
-			ch.connect(sk);
+			int ops = sk.interestOps();
+			ops &= ~SelectionKey.OP_CONNECT;
+			ops |= SelectionKey.OP_READ;
+			sk.interestOps(ops);
+			underLayer.connect();
 		}
 
 		if ((readyOps & SelectionKey.OP_ACCEPT) != 0) {
-			ch.accept(sk);
+			AbstractNioChannel channel = (AbstractNioChannel) underLayer.accept();
+			if (channel != null) {
+				channel.nioChannel().register(sk.selector(), SelectionKey.OP_READ, channel);
+			}
 		}
 
 		if ((readyOps & SelectionKey.OP_READ) != 0) {
-			ch.read(sk);
+			underLayer.read();
 		}
 
 		if ((readyOps & SelectionKey.OP_WRITE) != 0) {
 			// ch.write(null);
-		}
-	}
-
-	@Override
-	protected void runAllTasks() {
-		for (Runnable task; (task = pollTask()) != null;) {
-			task.run();
 		}
 	}
 

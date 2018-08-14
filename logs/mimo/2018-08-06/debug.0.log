@@ -1,0 +1,42 @@
+[DEBUG] 2018-08-06 16:25:28 [main] c.m.channel.nio.AbstractNioChannel - NioServerSocketChannel : connect success
+[DEBUG] 2018-08-06 16:25:28 [mimo_thread_8] Print - [{ACCEPT }]
+[DEBUG] 2018-08-06 16:25:33 [mimo_thread_2] Print - [{CONNECT }]
+[DEBUG] 2018-08-06 16:25:33 [mimo_thread_2] c.m.channel.nio.AbstractNioChannel - channel connect!true
+[DEBUG] 2018-08-06 16:25:33 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:25:33 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:26:11 [main] c.m.channel.nio.AbstractNioChannel - NioServerSocketChannel : connect success
+[DEBUG] 2018-08-06 16:26:11 [mimo_thread_8] Print - [{ACCEPT }]
+[DEBUG] 2018-08-06 16:26:16 [mimo_thread_2] Print - [{CONNECT }]
+[DEBUG] 2018-08-06 16:26:16 [mimo_thread_2] c.m.channel.nio.AbstractNioChannel - channel connect!true
+[DEBUG] 2018-08-06 16:26:16 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:26:16 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:27:30 [main] c.m.channel.nio.AbstractNioChannel - NioServerSocketChannel : connect success
+[DEBUG] 2018-08-06 16:27:30 [mimo_thread_8] Print - [{ACCEPT }]
+[DEBUG] 2018-08-06 16:27:34 [mimo_thread_2] Print - [{CONNECT }]
+[DEBUG] 2018-08-06 16:27:34 [mimo_thread_2] c.m.channel.nio.AbstractNioChannel - channel connect!true
+[DEBUG] 2018-08-06 16:27:34 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:27:34 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:28:32 [main] c.m.channel.nio.AbstractNioChannel - NioServerSocketChannel : connect success
+[DEBUG] 2018-08-06 16:28:32 [mimo_thread_8] Print - [{ACCEPT }]
+[DEBUG] 2018-08-06 16:28:38 [mimo_thread_2] Print - [{CONNECT }]
+[DEBUG] 2018-08-06 16:28:38 [mimo_thread_2] c.m.channel.nio.AbstractNioChannel - channel connect!true
+[DEBUG] 2018-08-06 16:28:38 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:28:38 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:56:30 [main] c.m.channel.nio.AbstractNioChannel - NioServerSocketChannel : connect success
+[DEBUG] 2018-08-06 16:56:30 [mimo_thread_8] Print - [{ACCEPT }]
+[DEBUG] 2018-08-06 16:56:30 [mimo_thread_8] c.m.channel.nio.AbstractNioChannel - channel accept!
+[DEBUG] 2018-08-06 16:56:34 [mimo_thread_2] Print - [{CONNECT }]
+[DEBUG] 2018-08-06 16:56:34 [mimo_thread_2] c.m.channel.nio.AbstractNioChannel - channel connect!true
+[DEBUG] 2018-08-06 16:56:34 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:56:30 [mimo_thread_8] Print - [{READ }]
+[DEBUG] 2018-08-06 16:56:34 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 16:56:30 [mimo_thread_8] c.m.channel.nio.AbstractNioChannel - channel read! true
+[DEBUG] 2018-08-06 17:13:05 [main] c.m.channel.nio.AbstractNioChannel - NioServerSocketChannel : connect success
+[DEBUG] 2018-08-06 17:13:05 [mimo_thread_8] Print - [{ACCEPT }]
+[DEBUG] 2018-08-06 17:13:05 [mimo_thread_8] c.m.channel.nio.AbstractNioChannel - channel accept success
+[DEBUG] 2018-08-06 17:13:09 [mimo_thread_2] Print - [{CONNECT }]
+[DEBUG] 2018-08-06 17:13:09 [mimo_thread_2] c.m.channel.nio.AbstractNioChannel - channel connect!true
+[DEBUG] 2018-08-06 17:13:09 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 17:13:09 [main] c.m.channel.nio.AbstractNioChannel - channel write!
+[DEBUG] 2018-08-06 17:13:05 [mimo_thread_8] Print - [{READ }]
+[DEBUG] 2018-08-06 17:13:05 [mimo_thread_8] c.m.channel.nio.AbstractNioChannel - channel read! true

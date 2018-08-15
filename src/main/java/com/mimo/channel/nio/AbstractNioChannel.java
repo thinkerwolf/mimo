@@ -21,7 +21,9 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractNioChannel.class);
 	protected SelectableChannel ch;
 	private SelectionKey selectionKey;
+	protected SocketAddress localAddress;
 
+	protected SocketAddress remoteAddress;
 	protected AbstractNioChannel(SelectableChannel ch, ChannelProcessorChain chain) {
 		super(chain);
 		this.ch = ch;
@@ -68,7 +70,13 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 			throw new RuntimeException(e);
 		}
 	}
+	public SocketAddress getLocalAddress() {
+		return localAddress;
+	}
 
+	public SocketAddress getRemoteAddress() {
+		return remoteAddress;
+	}
 	@Override
 	public void write(Object obj) {
 		fireMessageWrite(this.chain(), this, obj, false);

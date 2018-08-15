@@ -20,9 +20,6 @@ import static com.mimo.channel.Channels.*;
  */
 public class NioServerSocketChannel extends AbstractNioChannel implements com.mimo.channel.ServerSocketChannel {
 
-	private SocketAddress localAddress;
-
-	private SocketAddress remoteAddress;
 
 	private static ServerSocketChannel newSocket() {
 		try {
@@ -37,13 +34,7 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.mi
 		this.server = true;
 	}
 
-	public SocketAddress getLocalAddress() {
-		return localAddress;
-	}
 
-	public SocketAddress getRemoteAddress() {
-		return remoteAddress;
-	}
 
 	@Override
 	public ServerSocketChannel nioChannel() {
@@ -60,6 +51,8 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.mi
 		try {
 			NetUtils.bind(nioChannel(), localAddress);
 			selectionKey().interestOps(SelectionKey.OP_ACCEPT);
+			this.localAddress = localAddress;
+			this.remoteAddress = remoteAddress;
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

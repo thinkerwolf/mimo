@@ -2,10 +2,10 @@ package com.mimo.test.processor;
 
 import java.nio.ByteBuffer;
 
-import com.mimo.channel.ChannelProcessorContext;
-import com.mimo.channel.event.ChannelEvent;
-import com.mimo.channel.event.MessageEvent;
-import com.mimo.processor.SimpleChannelInboundProcessor;
+import com.thinkerwolf.mimo.channel.ChannelProcessorContext;
+import com.thinkerwolf.mimo.channel.event.ChannelEvent;
+import com.thinkerwolf.mimo.channel.event.MessageEvent;
+import com.thinkerwolf.mimo.processor.SimpleChannelInboundProcessor;
 
 public class TestServerChannelInbound extends SimpleChannelInboundProcessor {
 

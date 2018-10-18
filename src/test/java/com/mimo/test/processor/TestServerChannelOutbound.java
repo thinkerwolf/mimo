@@ -2,9 +2,9 @@ package com.mimo.test.processor;
 
 import java.nio.ByteBuffer;
 
-import com.mimo.channel.ChannelProcessorContext;
-import com.mimo.channel.event.WriteEvent;
-import com.mimo.processor.ChannelOutboundProcessorAdapter;
+import com.thinkerwolf.mimo.channel.ChannelProcessorContext;
+import com.thinkerwolf.mimo.channel.event.WriteEvent;
+import com.thinkerwolf.mimo.processor.ChannelOutboundProcessorAdapter;
 
 public class TestServerChannelOutbound extends ChannelOutboundProcessorAdapter {
 

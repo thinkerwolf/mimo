@@ -1,11 +1,11 @@
 package com.mimo.test;
 
-import com.mimo.bootstrap.ServerBootstrap;
-import com.mimo.channel.RunLoopGroup;
-import com.mimo.channel.nio.NioRunLoopGroup;
-import com.mimo.channel.nio.NioServerSocketChannel;
 import com.mimo.test.processor.TestServerChannelInbound;
 import com.mimo.test.processor.TestServerChannelOutbound;
+import com.thinkerwolf.mimo.bootstrap.ServerBootstrap;
+import com.thinkerwolf.mimo.channel.RunLoopGroup;
+import com.thinkerwolf.mimo.channel.nio.NioRunLoopGroup;
+import com.thinkerwolf.mimo.channel.nio.NioServerSocketChannel;
 
 public class ServerBootstrapTest {
 

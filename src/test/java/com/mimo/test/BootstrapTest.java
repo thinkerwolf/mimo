@@ -3,15 +3,15 @@ package com.mimo.test;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-import com.mimo.bootstrap.Bootstrap;
-import com.mimo.channel.Channel;
-import com.mimo.channel.RunLoopGroup;
-import com.mimo.channel.nio.NioRunLoopGroup;
-import com.mimo.channel.nio.NioSocketChannel;
-import com.mimo.concurrent.ChannelFuture;
 import com.mimo.test.processor.TestClientChannelInbound;
 import com.mimo.test.processor.TestClientChannelOutbound;
-import com.mimo.util.NetUtils;
+import com.thinkerwolf.mimo.bootstrap.Bootstrap;
+import com.thinkerwolf.mimo.channel.Channel;
+import com.thinkerwolf.mimo.channel.RunLoopGroup;
+import com.thinkerwolf.mimo.channel.nio.NioRunLoopGroup;
+import com.thinkerwolf.mimo.channel.nio.NioSocketChannel;
+import com.thinkerwolf.mimo.concurrent.ChannelFuture;
+import com.thinkerwolf.mimo.util.NetUtils;
 
 public class BootstrapTest {
 

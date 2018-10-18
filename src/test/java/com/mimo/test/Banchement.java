@@ -1,6 +1,6 @@
 package com.mimo.test;
 
-import com.mimo.util.NetUtils;
+import com.thinkerwolf.mimo.util.NetUtils;
 
 public class Banchement {
 	public static void main(String[] args) {

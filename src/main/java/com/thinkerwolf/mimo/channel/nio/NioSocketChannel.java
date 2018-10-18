@@ -54,6 +54,8 @@ public class NioSocketChannel extends AbstractNioChannel implements com.thinkerw
 				selectionKey().interestOps(SelectionKey.OP_CONNECT);
 			}
 			success = true;
+			this.localAddress = localAddress;
+			this.remoteAddress = remoteAddress;
 			return connected;
 		} catch (IOException e) {
 			if (!success) {

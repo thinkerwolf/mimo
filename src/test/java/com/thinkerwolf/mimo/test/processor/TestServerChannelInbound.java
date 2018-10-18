@@ -1,4 +1,4 @@
-package com.mimo.test.processor;
+package com.thinkerwolf.mimo.test.processor;
 
 import java.nio.ByteBuffer;
 

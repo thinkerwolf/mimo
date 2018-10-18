@@ -1,4 +1,4 @@
-package com.mimo.test;
+package com.thinkerwolf.mimo.test;
 
 import com.thinkerwolf.mimo.util.NetUtils;
 

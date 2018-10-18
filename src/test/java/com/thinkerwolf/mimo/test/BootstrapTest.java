@@ -1,16 +1,16 @@
-package com.mimo.test;
+package com.thinkerwolf.mimo.test;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-import com.mimo.test.processor.TestClientChannelInbound;
-import com.mimo.test.processor.TestClientChannelOutbound;
 import com.thinkerwolf.mimo.bootstrap.Bootstrap;
 import com.thinkerwolf.mimo.channel.Channel;
 import com.thinkerwolf.mimo.channel.RunLoopGroup;
 import com.thinkerwolf.mimo.channel.nio.NioRunLoopGroup;
 import com.thinkerwolf.mimo.channel.nio.NioSocketChannel;
 import com.thinkerwolf.mimo.concurrent.ChannelFuture;
+import com.thinkerwolf.mimo.test.processor.TestClientChannelInbound;
+import com.thinkerwolf.mimo.test.processor.TestClientChannelOutbound;
 import com.thinkerwolf.mimo.util.NetUtils;
 
 public class BootstrapTest {

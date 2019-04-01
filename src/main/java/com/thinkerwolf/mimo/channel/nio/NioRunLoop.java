@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thinkerwolf.mimo.channel.Channel;
 import com.thinkerwolf.mimo.channel.RunLoop;
+import com.thinkerwolf.mimo.channel.RunLoopGroup;
 import com.thinkerwolf.mimo.channel.Channel.UnderLayer;
 import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 import com.thinkerwolf.mimo.concurrent.SingleThreadPreExecutor;
@@ -31,12 +32,15 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 	private static final Logger logger = LoggerFactory.getLogger(NioRunLoop.class);
 
 	private Selector selector;
-
-	public NioRunLoop(ThreadFactory threadFactory, SelectorProvider provider) {
+	
+	private NioRunLoopGroup parent;
+	
+	public NioRunLoop(ThreadFactory threadFactory, SelectorProvider provider, NioRunLoopGroup parent) {
 		super(threadFactory);
 		ObjectUtil.isNotNull(provider, "SelectorProvider can't be null");
 		try {
 			this.selector = provider.openSelector();
+			this.parent = parent;
 		} catch (IOException e) {
 			logger.error("openSelector", e);
 		}
@@ -56,6 +60,7 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 		}
 	}
 
+	@Override
 	public void run() {
 		for (;;) {
 			try {
@@ -68,6 +73,8 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 
 			} catch (Throwable e) {
 				e.printStackTrace();
+			} finally {
+				
 			}
 		}
 	}
@@ -121,7 +128,7 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 			return;
 		}
 		final UnderLayer underLayer = ch.underLayer();
-		int readyOps = sk.readyOps();
+		final int readyOps = sk.readyOps();
 		if ((readyOps & SelectionKey.OP_CONNECT) != 0) {
 			int ops = sk.interestOps();
 			ops &= ~SelectionKey.OP_CONNECT;
@@ -132,9 +139,11 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 
 		if ((readyOps & SelectionKey.OP_ACCEPT) != 0) {
 			AbstractNioChannel channel = (AbstractNioChannel) underLayer.accept();
-			if (channel != null) {
-				channel.nioChannel().register(sk.selector(), SelectionKey.OP_READ, channel);
-			}
+			// modify by wukai on 2019.4.1
+			//if (channel != null) {
+				//channel.underLayer().accept();
+			//	channel.nioChannel().register(sk.selector(), SelectionKey.OP_READ, channel);
+			//}	
 		}
 
 		if ((readyOps & SelectionKey.OP_READ) != 0) {
@@ -148,6 +157,13 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 
 	public Selector getNioSelector() {
 		return this.selector;
+	}
+	
+	
+	
+	@Override
+	public RunLoopGroup parent() {
+		return parent;
 	}
 
 }

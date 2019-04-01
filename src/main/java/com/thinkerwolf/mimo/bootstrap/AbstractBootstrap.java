@@ -10,9 +10,9 @@ import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 
 public abstract class AbstractBootstrap<B extends AbstractBootstrap<B>> {
 
-	private RunLoopGroup group;
-	private ChannelFactory<Channel> channelFactory;
-	private ChannelInitializer initializer;
+	protected RunLoopGroup group;
+	protected ChannelFactory<Channel> channelFactory;
+	protected ChannelInitializer initializer;
 
 	@SuppressWarnings("unchecked")
 	public B channel(Class<? extends Channel> clazz) {
@@ -26,14 +26,14 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B>> {
 		return (B) this;
 	}
 
-	abstract void init();
+	abstract void init(Channel channel);
 
 	protected ChannelFuture initAndRegister() {
 		final Channel channel = channelFactory.newChannel();
 		initializer.initChannel(channel);
 		ChannelFuture future = group.register(channel);
 		channel.connect(localAddress(), remoteAddress());
-		init();
+		init(channel);
 		group.startExecutor();
 		return future;
 	}

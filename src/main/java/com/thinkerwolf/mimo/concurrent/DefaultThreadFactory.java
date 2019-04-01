@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DefaultThreadFactory implements ThreadFactory {
 
 	private static final AtomicInteger AI = new AtomicInteger();
-	private static final String DEFAULT_NAME_PREFIX = "mimo_thread";
+	private static final String DEFAULT_NAME_PREFIX = "mimo-thread";
 	public static final DefaultThreadFactory INSTANCE = new DefaultThreadFactory(DEFAULT_NAME_PREFIX);
 
 	private String prefix = DEFAULT_NAME_PREFIX;
@@ -20,7 +20,7 @@ public class DefaultThreadFactory implements ThreadFactory {
 
 	public Thread newThread(Runnable r) {
 		Thread thread = new Thread(r);
-		thread.setName(prefix + "_" + AI.incrementAndGet());
+		thread.setName(prefix + "-" + AI.incrementAndGet());
 		thread.setDaemon(false);
 		thread.setPriority(Thread.NORM_PRIORITY);
 		return thread;

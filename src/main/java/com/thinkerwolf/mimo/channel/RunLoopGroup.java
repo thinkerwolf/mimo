@@ -3,7 +3,7 @@ package com.thinkerwolf.mimo.channel;
 import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 
 public interface RunLoopGroup {
-
+	
 	RunLoop newRunLoop();
 
 	RunLoop next();

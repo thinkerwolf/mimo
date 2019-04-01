@@ -5,7 +5,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 
-public abstract class SingleThreadPreExecutor implements Executor {
+public abstract class SingleThreadPreExecutor implements Executor, Runnable {
 
 	private Thread thread;
 	protected boolean running;
@@ -13,11 +13,7 @@ public abstract class SingleThreadPreExecutor implements Executor {
 
 	public SingleThreadPreExecutor(ThreadFactory threadFactory) {
 		this.running = false;
-		this.thread = threadFactory.newThread(new Runnable() {
-			public void run() {
-				SingleThreadPreExecutor.this.run();
-			}
-		});
+		this.thread = threadFactory.newThread(this);
 		this.taskQueue = newTaskQueue();
 	}
 
@@ -34,8 +30,6 @@ public abstract class SingleThreadPreExecutor implements Executor {
 			}
 		}
 	}
-
-	protected abstract void run();
 
 	protected void runAllTasks() {
 		for (Runnable task; (task = pollTask()) != null;) {

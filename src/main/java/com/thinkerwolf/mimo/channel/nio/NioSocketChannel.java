@@ -34,7 +34,12 @@ public class NioSocketChannel extends AbstractNioChannel implements com.thinkerw
 		super(socketChannel, chain);
 		this.server = false;
 	}
-
+	
+	@Override
+	protected void beginRead(SelectionKey selectionKey) {
+		selectionKey.interestOps(selectionKey.interestOps() | SelectionKey.OP_READ);
+	}
+	
 	@Override
 	public ChannelProcessorChain chain() {
 		return super.chain();
@@ -77,7 +82,7 @@ public class NioSocketChannel extends AbstractNioChannel implements com.thinkerw
 			if (flush) {
 				sc.write(buf);
 				while (sc.write(buf) > 0) {
-
+					
 				}
 			} else {
 				// 新建write task
@@ -96,6 +101,10 @@ public class NioSocketChannel extends AbstractNioChannel implements com.thinkerw
 			NioSocketChannel channel = NioSocketChannel.this;
 			SocketChannel nioChannel = channel.nioChannel();
 			if (nioChannel != null) {
+				if (!nioChannel.isOpen()) {
+					
+					return;
+				}
 				try {
 					int totalReadNum = 0;
 					int tmpReadNum;
@@ -113,6 +122,10 @@ public class NioSocketChannel extends AbstractNioChannel implements com.thinkerw
 						buf.put(b);
 					}
 					buf.flip();
+					
+					int op = selectionKey().interestOps();
+					selectionKey().interestOps(op & ~SelectionKey.OP_READ);
+					
 					fireMessageReceived(channel.chain(), channel, buf);
 				} catch (Exception e) {
 					try {
@@ -129,9 +142,13 @@ public class NioSocketChannel extends AbstractNioChannel implements com.thinkerw
 		protected void doConnect() throws IOException {
 			NioSocketChannel channel = NioSocketChannel.this;
 			SocketChannel nioChannel = channel.nioChannel();
-			nioChannel.finishConnect();
-			channel.finishConnectFuture.setSuccess(null);
-			fireChannelConnected(channel.chain(), channel);
+			boolean success = nioChannel.finishConnect();
+			if (success) {
+				channel.finishConnectFuture.setSuccess(null);
+				fireChannelConnected(channel.chain(), channel);
+			} else {
+				channel.finishConnectFuture.setFailure(null);
+			}
 		}
 
 		@Override

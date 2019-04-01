@@ -10,4 +10,7 @@ public interface RunLoop extends Executor {
 	void register(Channel channel);
 	/** 注册Channel */
 	void register(Channel channel, ChannelFuture future);
+	
+	RunLoopGroup parent();
+	
 }

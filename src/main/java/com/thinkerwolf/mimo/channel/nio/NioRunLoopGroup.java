@@ -28,9 +28,11 @@ public class NioRunLoopGroup implements RunLoopGroup {
 	};
 
 	private final RunLoop[] children;
-
+	
+	NioRunLoopGroup workerGroup;
+	
 	public NioRunLoopGroup() {
-		this(0);
+		this(DEFAULT_GROUP_NUM);
 	}
 
 	public NioRunLoopGroup(int nThreads) {
@@ -42,7 +44,7 @@ public class NioRunLoopGroup implements RunLoopGroup {
 	}
 
 	public RunLoop newRunLoop() {
-		return new NioRunLoop(DefaultThreadFactory.INSTANCE, PlatformUtil.DEFAULT_PROVIDER);
+		return new NioRunLoop(DefaultThreadFactory.INSTANCE, PlatformUtil.DEFAULT_PROVIDER, this);
 	}
 
 	public RunLoop next() {

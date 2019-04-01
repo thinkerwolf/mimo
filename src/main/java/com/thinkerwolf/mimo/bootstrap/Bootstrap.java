@@ -3,6 +3,7 @@ package com.thinkerwolf.mimo.bootstrap;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import com.thinkerwolf.mimo.channel.Channel;
 import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 
 /**
@@ -32,8 +33,8 @@ public class Bootstrap extends AbstractBootstrap<Bootstrap> {
 	}
 
 	@Override
-	void init() {
-
+	void init(Channel channel) {
+		
 	}
 
 	@Override

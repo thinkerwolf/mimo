@@ -66,10 +66,16 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 			if (future != null) {
 				this.finishConnectFuture = future;
 			}
+			beginRead(selectionKey);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	protected void beginRead(SelectionKey selectionKey) {
+		
+	}
+	
 	public SocketAddress getLocalAddress() {
 		return localAddress;
 	}

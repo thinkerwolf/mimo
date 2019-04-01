@@ -20,9 +20,9 @@ public class BootstrapTest {
 		RunLoopGroup group = new NioRunLoopGroup(2);
 		bootstrap.channel(NioSocketChannel.class);
 		bootstrap.channelInitialize(channel -> {
-            channel.chain().addLast("inbound", new TestClientChannelInbound());
-            channel.chain().addLast("outbound", new TestClientChannelOutbound());
-        });
+			channel.chain().addLast("inbound", new TestClientChannelInbound());
+			channel.chain().addLast("outbound", new TestClientChannelOutbound());
+		});
 		bootstrap.group(group);
 		ChannelFuture future = bootstrap
 				.connect(new InetSocketAddress(NetUtils.getLocalhostAddress().getHostAddress(), 8088));
@@ -46,11 +46,21 @@ public class BootstrapTest {
 	}
 
 	public static void main(String[] args) {
-		try {
-			start();
-		} catch (Exception e) {
-			e.printStackTrace();
+		
+		for (int i = 0; i < 100; i++) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						BootstrapTest.start();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
 		}
+		
+
 	}
 
 }

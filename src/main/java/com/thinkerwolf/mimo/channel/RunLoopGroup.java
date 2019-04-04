@@ -1,7 +1,5 @@
 package com.thinkerwolf.mimo.channel;
 
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
-
 public interface RunLoopGroup {
 	
 	RunLoop newRunLoop();
@@ -10,7 +8,7 @@ public interface RunLoopGroup {
 	
 	ChannelFuture register(Channel channel);
 	
-	ChannelFuture register(Channel channel, ChannelFuture future);
+	ChannelFuture register(Channel channel, ChannelPromise promise);
 	
 	void startExecutor();
 	

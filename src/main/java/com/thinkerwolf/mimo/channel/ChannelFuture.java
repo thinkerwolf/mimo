@@ -1,10 +1,9 @@
 package com.thinkerwolf.mimo.channel;
 
-import java.util.concurrent.Future;
+import com.thinkerwolf.mimo.concurrent.Future;
 
-public interface ChannelFuture extends Future<Void>{
-	
+public interface ChannelFuture extends Future<Void> {
+
 	Channel channel();
-	
 	
 }

@@ -7,14 +7,15 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thinkerwolf.mimo.channel.AbstractChannel;
 import com.thinkerwolf.mimo.channel.ChannelProcessorChain;
+import com.thinkerwolf.mimo.channel.ChannelPromise;
 import com.thinkerwolf.mimo.channel.RunLoop;
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 import com.thinkerwolf.mimo.util.ObjectUtil;
 
 public abstract class AbstractNioChannel extends AbstractChannel {
@@ -22,19 +23,30 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 	protected SelectableChannel ch;
 	private SelectionKey selectionKey;
 	protected SocketAddress localAddress;
-
 	protected SocketAddress remoteAddress;
+
 	protected AbstractNioChannel(SelectableChannel ch, ChannelProcessorChain chain) {
 		super(chain);
 		this.ch = ch;
+		try {
+			ch.configureBlocking(false);
+		} catch (IOException e) {
+			try {
+				ch.close();
+			} catch (IOException e2) {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Failed to close a partially initialized socket.", e2);
+				}
+			}
+			throw new RuntimeException("Failed to enter non-blocking mode.", e);
+		}
 	}
 
 	public AbstractNioChannel(SelectableChannel ch) {
-		super();
-		this.ch = ch;
+		this(ch, null);
 	}
 
-	public SelectableChannel nioChannel() {
+	public SelectableChannel javaChannel() {
 		return ch;
 	}
 
@@ -46,7 +58,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 		try {
 			if (doConnect(localAddress, remoteAddress)) {
 				if (localAddress != null) {
-					this.finishConnectFuture.setSuccess(null);
+					this.finishConnectPromise.setSuccess(null);
 				}
 				logger.debug(this.getClass().getSimpleName() + " : connect success");
 			}
@@ -59,23 +71,27 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 	protected abstract boolean doConnect(SocketAddress localAddress, SocketAddress remoteAddress) throws Exception;
 
 	@Override
-	public void register(RunLoop runLoop, ChannelFuture future) {
+	public void register(RunLoop runLoop, ChannelPromise promise) {
 		try {
-			nioChannel().configureBlocking(false);
-			selectionKey = nioChannel().register(((NioRunLoop) runLoop).getNioSelector(), 0, this);
-			if (future != null) {
-				this.finishConnectFuture = future;
-			}
+			SelectableChannel channel = javaChannel();
+			Selector selector = ((NioRunLoop) runLoop).getNioSelector();
+			selectionKey = channel.register(selector, 0, this);
 			beginRead(selectionKey);
+			selector.wakeup();
+			if (promise != null) {
+				this.finishConnectPromise = promise;
+			}
+			promise.setSuccess(null);
 		} catch (Exception e) {
+			promise.setFailure(null);
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	protected void beginRead(SelectionKey selectionKey) {
-		
+
 	}
-	
+
 	public SocketAddress getLocalAddress() {
 		return localAddress;
 	}
@@ -83,6 +99,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 	public SocketAddress getRemoteAddress() {
 		return remoteAddress;
 	}
+
 	@Override
 	public void write(Object obj) {
 		fireMessageWrite(this.chain(), this, obj, false);
@@ -109,7 +126,16 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 		doWrite((ByteBuffer) obj, flush);
 	}
 
+	protected abstract void doRead();
+
+	protected abstract void doConnect() throws IOException;
+
 	protected abstract class AbstractNioUnderLayer extends AbstractUnderLayer {
+
+		@Override
+		public void register(RunLoop runLoop) throws IOException {
+			SelectableChannel ch = javaChannel();
+		}
 
 		@Override
 		public void read() {
@@ -126,9 +152,6 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 			AbstractNioChannel.this.ch.close();
 		}
 
-		protected abstract void doConnect() throws IOException;
-
-		protected abstract void doRead();
 	}
 
 }

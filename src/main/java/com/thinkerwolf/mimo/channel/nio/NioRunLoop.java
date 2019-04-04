@@ -13,10 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thinkerwolf.mimo.channel.Channel;
+import com.thinkerwolf.mimo.channel.ChannelPromise;
 import com.thinkerwolf.mimo.channel.RunLoop;
 import com.thinkerwolf.mimo.channel.RunLoopGroup;
 import com.thinkerwolf.mimo.channel.Channel.UnderLayer;
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 import com.thinkerwolf.mimo.concurrent.SingleThreadPreExecutor;
 import com.thinkerwolf.mimo.util.ObjectUtil;
 import com.thinkerwolf.mimo.util.PrintUtil;
@@ -32,9 +32,9 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 	private static final Logger logger = LoggerFactory.getLogger(NioRunLoop.class);
 
 	private Selector selector;
-	
+
 	private NioRunLoopGroup parent;
-	
+
 	public NioRunLoop(ThreadFactory threadFactory, SelectorProvider provider, NioRunLoopGroup parent) {
 		super(threadFactory);
 		ObjectUtil.isNotNull(provider, "SelectorProvider can't be null");
@@ -52,12 +52,26 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 	}
 
 	@Override
-	public void register(Channel channel, ChannelFuture future) {
-		try {
-			channel.register(this, future);
-		} catch (Throwable e) {
-			logger.debug("NioRunLoop register error", e);
+	public void register(Channel channel, ChannelPromise promise) {
+		if (channel == null) {
+			promise.setFailure(null);
+			return;
 		}
+		// TODO
+		if (inLoop()) {
+			register0(channel, promise);
+		} else {
+			addTask(new Runnable() {
+				@Override
+				public void run() {
+					register0(channel, promise);
+				}
+			});
+		}
+	}
+
+	private void register0(Channel channel, ChannelPromise promise) {
+		channel.register(this, promise);
 	}
 
 	@Override
@@ -74,7 +88,7 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 			} catch (Throwable e) {
 				e.printStackTrace();
 			} finally {
-				
+
 			}
 		}
 	}
@@ -88,7 +102,8 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 		long currentTimeNanos = System.nanoTime();
 		long selectDeadLineNanos = currentTimeNanos + TimeUnit.SECONDS.toNanos(1);
 		long timeoutMillis = (selectDeadLineNanos - currentTimeNanos + 500000L) / 1000000L;
-		if (hasTask()) {
+		Set<SelectionKey> registeredKeys = selector.keys();
+		if (hasTask() && !registeredKeys.isEmpty()) {
 			selector.selectNow();
 		} else {
 			selector.select(timeoutMillis);
@@ -97,7 +112,13 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 
 	private void processSelectedKeys() throws Throwable {
 		// if (selectedKeySet == null) {
-		processSelectedKeysPlain(selector.selectedKeys());
+		Set<SelectionKey> registeredKeys = selector.keys();
+		if (!registeredKeys.isEmpty()) {
+			Set<SelectionKey> keys = selector.selectedKeys();
+			processSelectedKeysPlain(keys);
+			keys.clear();
+		}
+
 		// } else {
 		// processSelectedKeysPlain(selectedKeySet);
 		// }
@@ -108,7 +129,6 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 		if (keySet.size() > 0) {
 			PrintUtil.printSelectedKeys(keySet);
 		}
-
 		for (; iter.hasNext();) {
 			final SelectionKey sk = iter.next();
 			final Object obj = sk.attachment();
@@ -140,10 +160,11 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 		if ((readyOps & SelectionKey.OP_ACCEPT) != 0) {
 			AbstractNioChannel channel = (AbstractNioChannel) underLayer.accept();
 			// modify by wukai on 2019.4.1
-			//if (channel != null) {
-				//channel.underLayer().accept();
-			//	channel.nioChannel().register(sk.selector(), SelectionKey.OP_READ, channel);
-			//}	
+			// if (channel != null) {
+			// channel.underLayer().accept();
+			// channel.nioChannel().register(sk.selector(),
+			// SelectionKey.OP_READ, channel);
+			// }
 		}
 
 		if ((readyOps & SelectionKey.OP_READ) != 0) {
@@ -158,9 +179,7 @@ public class NioRunLoop extends SingleThreadPreExecutor implements RunLoop {
 	public Selector getNioSelector() {
 		return this.selector;
 	}
-	
-	
-	
+
 	@Override
 	public RunLoopGroup parent() {
 		return parent;

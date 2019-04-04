@@ -10,6 +10,8 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang3.time.StopWatch;
+
 public class Handler implements Runnable {
 
     static int READING = 0, SENDING = 1;
@@ -24,11 +26,15 @@ public class Handler implements Runnable {
     int state = READING;
 
     public Handler(Selector selector, SocketChannel socket) throws ClosedChannelException {
+    	StopWatch sw = new StopWatch();
+    	sw.start();
         this.socket = socket;
         sk = socket.register(selector, 0);
         sk.attach(this);
         sk.interestOps(SelectionKey.OP_READ);
         selector.wakeup();
+        sw.stop();
+        System.err.println("Handler register time : " + sw.getTime());
     }
 
     @Override

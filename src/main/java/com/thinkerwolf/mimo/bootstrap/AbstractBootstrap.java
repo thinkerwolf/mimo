@@ -4,9 +4,10 @@ import java.net.SocketAddress;
 
 import com.thinkerwolf.mimo.channel.Channel;
 import com.thinkerwolf.mimo.channel.ChannelFactory;
+import com.thinkerwolf.mimo.channel.ChannelFuture;
+import com.thinkerwolf.mimo.channel.ChannelFutureListener;
 import com.thinkerwolf.mimo.channel.ChannelInitializer;
 import com.thinkerwolf.mimo.channel.RunLoopGroup;
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 
 public abstract class AbstractBootstrap<B extends AbstractBootstrap<B>> {
 
@@ -31,10 +32,15 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B>> {
 	protected ChannelFuture initAndRegister() {
 		final Channel channel = channelFactory.newChannel();
 		initializer.initChannel(channel);
-		ChannelFuture future = group.register(channel);
-		channel.connect(localAddress(), remoteAddress());
-		init(channel);
 		group.startExecutor();
+		ChannelFuture future = group.register(channel);
+		future.addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				channel.connect(localAddress(), remoteAddress());
+				init(channel);
+			}
+		});
 		return future;
 	}
 

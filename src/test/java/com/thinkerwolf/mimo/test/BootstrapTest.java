@@ -5,10 +5,10 @@ import java.nio.ByteBuffer;
 
 import com.thinkerwolf.mimo.bootstrap.Bootstrap;
 import com.thinkerwolf.mimo.channel.Channel;
+import com.thinkerwolf.mimo.channel.ChannelFuture;
 import com.thinkerwolf.mimo.channel.RunLoopGroup;
 import com.thinkerwolf.mimo.channel.nio.NioRunLoopGroup;
 import com.thinkerwolf.mimo.channel.nio.NioSocketChannel;
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
 import com.thinkerwolf.mimo.test.processor.TestClientChannelInbound;
 import com.thinkerwolf.mimo.test.processor.TestClientChannelOutbound;
 import com.thinkerwolf.mimo.util.NetUtils;
@@ -17,7 +17,7 @@ public class BootstrapTest {
 
 	public static void start() throws InterruptedException {
 		Bootstrap bootstrap = new Bootstrap();
-		RunLoopGroup group = new NioRunLoopGroup(2);
+		RunLoopGroup group = new NioRunLoopGroup(1);
 		bootstrap.channel(NioSocketChannel.class);
 		bootstrap.channelInitialize(channel -> {
 			channel.chain().addLast("inbound", new TestClientChannelInbound());
@@ -47,7 +47,7 @@ public class BootstrapTest {
 
 	public static void main(String[] args) {
 		
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 10; i++) {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {

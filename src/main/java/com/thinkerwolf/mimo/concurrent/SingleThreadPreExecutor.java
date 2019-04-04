@@ -52,5 +52,9 @@ public abstract class SingleThreadPreExecutor implements Executor, Runnable {
 	public void addTask(Runnable command) {
 		taskQueue.offer(command);
 	}
-
+	
+	public boolean inLoop() {
+		return thread == Thread.currentThread();
+	}
+	
 }

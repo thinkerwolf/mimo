@@ -12,7 +12,7 @@ public class ServerBootstrapTest {
 	public static void start() {
 		ServerBootstrap bootstrap = new ServerBootstrap();
 		RunLoopGroup bossGroup = new NioRunLoopGroup(2);
-		RunLoopGroup workerGroup = new NioRunLoopGroup(10);
+		RunLoopGroup workerGroup = new NioRunLoopGroup(3);
 		bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).channelInitialize(channel -> {
 			channel.chain().addLast("inbound", new TestServerChannelInbound());
 			channel.chain().addLast("outbound", new TestServerChannelOutbound());

@@ -37,8 +37,8 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.th
 
 
 	@Override
-	public ServerSocketChannel nioChannel() {
-		return (ServerSocketChannel) super.nioChannel();
+	public ServerSocketChannel javaChannel() {
+		return (ServerSocketChannel) super.javaChannel();
 	}
 
 	/**
@@ -49,14 +49,14 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.th
 	@Override
 	public boolean doConnect(SocketAddress localAddress, SocketAddress remoteAddress) throws Exception {
 		try {
-			NetUtils.bind(nioChannel(), localAddress);
+			NetUtils.bind(javaChannel(), localAddress);
 			selectionKey().interestOps(SelectionKey.OP_ACCEPT);
 			this.localAddress = localAddress;
 			this.remoteAddress = remoteAddress;
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			nioChannel().close();
+			javaChannel().close();
 		}
 		return false;
 	}
@@ -69,22 +69,22 @@ public class NioServerSocketChannel extends AbstractNioChannel implements com.th
 	public void doWrite(ByteBuffer buf, boolean flush) {
 		throw new RuntimeException("NioServerSocket can't write");
 	}
-
+	
+	@Override
+	protected void doRead() {
+		// do nothing
+	}
+	
+	@Override
+	protected void doConnect() throws IOException {
+		// do nothing
+	}
+	
 	class NioServerUnderLayer extends AbstractNioUnderLayer {
-
-		@Override
-		protected void doRead() {
-			// do nothing
-		}
-
-		@Override
-		protected void doConnect() throws IOException {
-			// do nothing
-		}
-
+		
 		@Override
 		public Channel accept() throws IOException {
-			SocketChannel sc = NetUtils.accept(nioChannel());
+			SocketChannel sc = NetUtils.accept(javaChannel());
 			if (sc != null) {
 				sc.configureBlocking(false);
 				NioSocketChannel nsc = new NioSocketChannel(sc, NioServerSocketChannel.this.chain());

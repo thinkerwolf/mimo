@@ -2,12 +2,16 @@ package com.thinkerwolf.mimo.bootstrap;
 
 import java.net.SocketAddress;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.thinkerwolf.mimo.channel.Channel;
+import com.thinkerwolf.mimo.channel.ChannelFuture;
 import com.thinkerwolf.mimo.channel.ChannelProcessorContext;
+import com.thinkerwolf.mimo.channel.DefaultChannelPromise;
 import com.thinkerwolf.mimo.channel.RunLoopGroup;
 import com.thinkerwolf.mimo.channel.event.ChannelEvent;
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
-import com.thinkerwolf.mimo.concurrent.DefaultChannelFuture;
 import com.thinkerwolf.mimo.processor.ChannelInboundProcessor;
 import com.thinkerwolf.mimo.util.NetUtils;
 
@@ -18,6 +22,8 @@ import com.thinkerwolf.mimo.util.NetUtils;
  *
  */
 public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap> {
+
+	private static final Logger logger = LoggerFactory.getLogger(ServerBootstrap.class);
 
 	private SocketAddress localAddress;
 	private RunLoopGroup workerGroup;
@@ -78,10 +84,12 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap> {
 
 		@Override
 		public void channelAccepted(ChannelProcessorContext ctx, ChannelEvent event) {
-			
 			Channel channel = event.channel();
-			workerGroup.next().register(channel, new DefaultChannelFuture(channel));
-			
+			StopWatch sw = new StopWatch();
+			sw.start();
+			workerGroup.register(channel, new DefaultChannelPromise(channel));
+			sw.stop();
+			logger.debug("Server channel register time : {}", sw.getTime());
 			ctx.sendAccepted(event);
 		}
 

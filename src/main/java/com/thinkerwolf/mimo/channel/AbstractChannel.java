@@ -1,10 +1,8 @@
 package com.thinkerwolf.mimo.channel;
 
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
-
 public abstract class AbstractChannel implements Channel {
 
-	protected ChannelFuture finishConnectFuture;
+	protected ChannelPromise finishConnectPromise;
 
 	protected boolean server;
 
@@ -21,8 +19,8 @@ public abstract class AbstractChannel implements Channel {
 		this(null);
 	}
 
-	public ChannelFuture getFinishConnectFuture() {
-		return finishConnectFuture;
+	public ChannelPromise getFinishConnectFuture() {
+		return finishConnectPromise;
 	}
 
 	@Override

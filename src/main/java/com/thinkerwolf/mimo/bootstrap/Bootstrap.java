@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import com.thinkerwolf.mimo.channel.Channel;
-import com.thinkerwolf.mimo.concurrent.ChannelFuture;
+import com.thinkerwolf.mimo.channel.ChannelFuture;
 
 /**
  * 客户端启动类
